@@ -1,7 +1,6 @@
 from django.urls import path
-from . import views
-
+from .views import hello
 
 urlpatterns = [
-  path('api/hello?visitor_name=<str:visitor_name', views.stageone),
+    path('hello/visitor_names =/<str:visitor_name>/', hello, name='hello'),
 ]
