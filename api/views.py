@@ -5,10 +5,9 @@ from django.http import JsonResponse
 def hello(request):
     visitor_name = request.GET.get('visitor_name', 'Guest')
     provided_city = request.GET.get('city')
-    api_key = os.getenv('OPENWEATHERMAP_API_KEY')
 
     # Get client IP
-    client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+    client_ip = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
 
     try:
         if provided_city:
@@ -24,7 +23,7 @@ def hello(request):
             city = location_data.get('city', 'Unknown City')
 
         if city == 'Unknown City' or 'bogon' in location_data:
-            city = 'Osogbo'  # Default city as fallback
+            city = 'Unknown City'  # Default city as fallback
             print(f"Using default city: {city}")
 
         # Get weather info
@@ -37,15 +36,18 @@ def hello(request):
         print(f"Weather API Response: {weather_data}")
 
         if 'main' not in weather_data:
-            raise ValueError(f"Weather data not found for city: {city}. Response: {weather_data}")
-
-        temperature = weather_data['main']['temp']
-
-        response = {
-            "client_ip": client_ip,
-            "location": city,
-            "greeting": f"Hello, {visitor_name}!, the temperature is {temperature} degrees Celsius in {city}"
-        }
+            response = {
+                "client_ip": client_ip,
+                "location": "Unknown City",
+                "greeting": f"Hello, {visitor_name}!, the temperature is N/A degrees Celsius in Unknown City "
+            }
+        else:
+            temperature = weather_data['main']['temp']
+            response = {
+                "client_ip": client_ip,
+                "location": city,
+                "greeting": f"Hello, {visitor_name}!, the temperature is {temperature} degrees Celsius in {city}"
+            }
     except Exception as e:
         response = {"error": str(e)}
 
