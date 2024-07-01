@@ -1,8 +1,8 @@
 import requests
 from django.http import JsonResponse
 
-def stageone(request):
-    visitor_name = request.GET.get('visitor_name', 'Guest')
+def stageone(request, visitor_name):
+    visitor_name = request.GET.get('visitor_name', 'Mark')
 
     # Get client IP
     client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
